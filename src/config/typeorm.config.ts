@@ -13,8 +13,8 @@ export const dataSourceOptions: DataSourceOptions = {
 	port: +configService.get('TYPEORM_PORT'),
 	database: configService.get('TYPEORM_DB'),
 	synchronize: configService.get('TYPEORM_SYNCHRONIZE') === 'true',
-	entities: ['src/**/*.entity.ts'],
-	migrations: ['src/migrations/*.ts'],
+	entities: ['dist/**/*.entity.js'],
+	migrations: ['dist/migrations/*.js'],
 }
 
 export const dataSource = new DataSource(dataSourceOptions)
