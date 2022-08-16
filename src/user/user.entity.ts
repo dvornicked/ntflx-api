@@ -18,7 +18,7 @@ export class UserEntity {
 	@PrimaryGeneratedColumn()
 	id: number
 
-	@Column()
+	@Column({ unique: true })
 	username: string
 
 	@Column()
@@ -29,7 +29,7 @@ export class UserEntity {
 		this.password = await hash(this.password, 10)
 	}
 
-	@Column()
+	@Column({ unique: true })
 	email: string
 
 	@Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
