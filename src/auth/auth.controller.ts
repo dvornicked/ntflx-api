@@ -7,9 +7,10 @@ import {
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { AuthDto } from './dto/auth.dto'
+import { RefreshTokenDto } from './dto/refreshToken.dto'
 import { RegisterDto } from './dto/register.dto'
 
-@Controller()
+@Controller('auth')
 export class AuthController {
 	constructor(private readonly authService: AuthService) {}
 
@@ -23,5 +24,10 @@ export class AuthController {
 	@Post('login')
 	async login(@Body() dto: AuthDto) {
 		return this.authService.login(dto)
+	}
+
+	@Post('token')
+	async refreshToken(@Body() dto: RefreshTokenDto) {
+		return this.authService.refreshToken(dto)
 	}
 }
