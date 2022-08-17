@@ -49,7 +49,7 @@ export class AuthService {
 	}
 
 	async iTokens(user: UserEntity) {
-		const payload = { username: user.username, sub: user.id }
+		const payload = { id: user.id }
 		const accessToken = await this.jwtService.signAsync(payload, {
 			expiresIn: '1h',
 		})
@@ -66,7 +66,7 @@ export class AuthService {
 		if (!payload)
 			throw new HttpException('Refresh token invalid or expired', 401)
 		const user = await this.authRepository.findOneBy({
-			username: payload.username,
+			id: payload.id,
 		})
 		return {
 			user: this.userTransform(user),

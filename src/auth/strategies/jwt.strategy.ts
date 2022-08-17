@@ -19,8 +19,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 		})
 	}
 
-	async validate({ username }: Pick<UserEntity, 'username'>) {
-		const user = await this.userRepository.findOneBy({ username })
+	async validate({ id }: Pick<UserEntity, 'id'>) {
+		const user = await this.userRepository.findOneBy({ id })
 		if (!user) throw new HttpException('User not found', 404)
 		return user
 	}
