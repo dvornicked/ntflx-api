@@ -1,6 +1,7 @@
 import { hash } from 'bcrypt'
 import {
 	BeforeInsert,
+	BeforeUpdate,
 	Column,
 	CreateDateColumn,
 	Entity,
@@ -25,6 +26,7 @@ export class UserEntity {
 	password: string
 
 	@BeforeInsert()
+	@BeforeUpdate()
 	async hashPassword() {
 		this.password = await hash(this.password, 10)
 	}
