@@ -18,3 +18,17 @@ export class UserInterceptor implements NestInterceptor {
 		)
 	}
 }
+
+@Injectable()
+export class UsersInterceptor implements NestInterceptor {
+	intercept(_: ExecutionContext, next: CallHandler): Observable<UserEntity> {
+		return next.handle().pipe(
+			map(data => {
+				data.users.forEach((user: UserEntity) => {
+					delete user.password
+				})
+				return data
+			}),
+		)
+	}
+}
