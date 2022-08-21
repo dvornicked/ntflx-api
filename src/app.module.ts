@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config'
 import { UserModule } from './user/user.module'
 import { FileModule } from './file/file.module'
 import { ActorModule } from './actor/actor.module'
+import { GenreModule } from './genre/genre.module'
 
 @Module({
 	imports: [
@@ -15,6 +16,7 @@ import { ActorModule } from './actor/actor.module'
 		UserModule,
 		FileModule,
 		ActorModule,
+		GenreModule,
 	],
 })
 export class AppModule {}
