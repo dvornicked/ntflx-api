@@ -61,8 +61,8 @@ export class UserService {
 		if (query.offset) queryBuilder.offset(query.offset)
 		if (query.order) queryBuilder.orderBy(query.order)
 		if (query.username)
-			queryBuilder.andWhere('user.username LIKE :username', {
-				username: `%${query.username}%`,
+			queryBuilder.andWhere('LOWER(user.username) LIKE :username', {
+				username: `%${query.username.toLowerCase()}%`,
 			})
 		const users = await queryBuilder.getMany()
 		return { users, count }
