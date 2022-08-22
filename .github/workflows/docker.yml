@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile -t ntflx-api
+      run: docker build . -t ntflx-api
     - name: Login to ghcr.io
       run: docker login ghcr.io -u dvornicked -p ${{ secrets.DOCKER_TOKEN }}
     - name: Tag the Docker image
