@@ -1,0 +1,27 @@
+version: '3'
+services:
+  api:
+    image: ghcr.io/dvornicked/ntflx-api:latest
+    container_name: ntflx-api
+    restart: always
+    ports:
+      - '3001:3001'
+    volumes:
+      - static:/opt/ntflx/static
+    depends_on:
+      - db
+  db:
+    image: postgres:14-alpine
+    container_name: ntflx-db
+    environment:
+      POSTGRES_USER: '${POSTGRES_USER}'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD}'
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./sqls:/docker-entrypoint-initdb.d
+    ports:
+      - '${POSTGRES_PORT_HOST}:${POSTGRES_PORT_CONTAINER}'
+
+volumes:
+  static:
+  db:
