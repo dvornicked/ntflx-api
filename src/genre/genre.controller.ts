@@ -17,7 +17,7 @@ import { UpdateGenreDto } from './dto/updateGenre.dto'
 import { GenreService } from './genre.service'
 import { IGenreQuery } from './types/IActorsQuery.interface'
 
-@Controller('genre')
+@Controller('genres')
 export class GenreController {
 	constructor(private readonly genreService: GenreService) {}
 

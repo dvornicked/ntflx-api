@@ -10,7 +10,7 @@ import { AuthDto } from './dto/auth.dto'
 import { RefreshTokenDto } from './dto/refreshToken.dto'
 import { RegisterDto } from './dto/register.dto'
 
-@Controller('auth')
+@Controller()
 export class AuthController {
 	constructor(private readonly authService: AuthService) {}
 
