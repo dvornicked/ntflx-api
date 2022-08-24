@@ -17,7 +17,7 @@ import { Auth } from 'src/auth/decorators/auth.decorator'
 import { UserRole } from 'src/user/user.entity'
 import { UpdateActorDto } from './dto/updateActor.dto'
 
-@Controller('actor')
+@Controller('actors')
 export class ActorController {
 	constructor(private readonly actorService: ActorService) {}
 
