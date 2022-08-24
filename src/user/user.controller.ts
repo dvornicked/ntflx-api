@@ -22,6 +22,8 @@ import { UpdateUserDto } from './dto/updateUser.dto'
 import { UpdateRoleDto } from './dto/updateRole.dto'
 import { UpdatePasswordDto } from './dto/updatePassword.dto'
 import { IUsersQuery } from './types/usersQuery.interface'
+import { IFavoriteQuery } from './types/favoriteQuery.interface'
+import { favoriteFilmDto } from './dto/favoriteFilm.dto'
 
 @Controller()
 export class UserController {
@@ -46,6 +48,22 @@ export class UserController {
 	@UsePipes(new ValidationPipe())
 	async updateUser(@User('id') id: number, @Body() dto: UpdateUserDto) {
 		return this.userService.updateUser(id, dto)
+	}
+
+	@Get('favorite/films')
+	@Auth()
+	async getFavoriteFilms(
+		@User('id') id: number,
+		@Query() query: IFavoriteQuery,
+	) {
+		return this.userService.getFavoriteFilms(id, query)
+	}
+
+	@Put('favorite/film')
+	@Auth()
+	@UsePipes(new ValidationPipe())
+	async toggleFavorite(@User('id') id: number, @Body() dto: favoriteFilmDto) {
+		return this.userService.toggleFavoriteFilm(id, dto)
 	}
 
 	@Get('profile/:id')

@@ -6,15 +6,23 @@ import { UpdateUserDto } from './dto/updateUser.dto'
 import { UpdateRoleDto } from './dto/updateRole.dto'
 import { UserEntity } from './user.entity'
 import { IUsersQuery } from './types/usersQuery.interface'
+import { FilmEntity } from 'src/film/film.entity'
+import { IFavoriteQuery } from './types/favoriteQuery.interface'
+import { favoriteFilmDto } from './dto/favoriteFilm.dto'
 
 @Injectable()
 export class UserService {
 	constructor(
 		@InjectRepository(UserEntity)
 		private readonly userRepository: Repository<UserEntity>,
+		@InjectRepository(FilmEntity)
+		private readonly filmRepository: Repository<FilmEntity>,
 	) {}
 	async findById(id: number): Promise<UserEntity> {
-		const user = await this.userRepository.findOneBy({ id })
+		const user = await this.userRepository.findOne({
+			where: { id },
+			relations: ['favoriteFilms'],
+		})
 		if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
 		return user
 	}
@@ -71,5 +79,29 @@ export class UserService {
 	async deleteUser(id: number) {
 		const user = await this.findById(id)
 		return this.userRepository.remove(user)
+	}
+
+	async toggleFavoriteFilm(id: number, dto: favoriteFilmDto) {
+		const user = await this.findById(id)
+		const film = await this.filmRepository.findOneBy({ id: dto.filmId })
+		if (!film) throw new HttpException('Film not found', HttpStatus.NOT_FOUND)
+		if (user.favoriteFilms.includes(film)) {
+			user.favoriteFilms = user.favoriteFilms.filter(f => f.id !== film.id)
+		} else {
+			user.favoriteFilms.push(film)
+		}
+		return this.userRepository.save(user)
+	}
+
+	async getFavoriteFilms(id: number, query: IFavoriteQuery) {
+		const user = await this.findById(id)
+		if (query.offset)
+			user.favoriteFilms = user.favoriteFilms.slice(query.offset)
+		query.order === 'ASC'
+			? user.favoriteFilms.sort()
+			: user.favoriteFilms.sort().reverse()
+		if (query.limit)
+			user.favoriteFilms = user.favoriteFilms.slice(0, query.limit)
+		return user.favoriteFilms
 	}
 }
