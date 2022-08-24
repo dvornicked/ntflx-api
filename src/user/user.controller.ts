@@ -48,14 +48,6 @@ export class UserController {
 		return this.userService.updateUser(id, dto)
 	}
 
-	@Put('profile/password')
-	@Auth()
-	@UseInterceptors(UserInterceptor)
-	@UsePipes(new ValidationPipe())
-	async updatePassword(@User('id') id: number, @Body() dto: UpdatePasswordDto) {
-		return this.userService.updatePassword(id, dto)
-	}
-
 	@Get('profile/:id')
 	@UseInterceptors(UserInterceptor)
 	async getUserById(@Param('id') id: number): Promise<UserEntity> {
@@ -77,7 +69,15 @@ export class UserController {
 		return this.userService.deleteUser(id)
 	}
 
-	@Put('profile/:id/password')
+	@Put('password')
+	@Auth()
+	@UseInterceptors(UserInterceptor)
+	@UsePipes(new ValidationPipe())
+	async updatePassword(@User('id') id: number, @Body() dto: UpdatePasswordDto) {
+		return this.userService.updatePassword(id, dto)
+	}
+
+	@Put('password/:id')
 	@Auth(UserRole.ADMIN)
 	@UseInterceptors(UserInterceptor)
 	@UsePipes(new ValidationPipe())
@@ -88,7 +88,7 @@ export class UserController {
 		return this.userService.updatePassword(id, dto)
 	}
 
-	@Put('profile/:id/role')
+	@Put('role/:id')
 	@Auth(UserRole.ADMIN)
 	@UseInterceptors(UserInterceptor)
 	@UsePipes(new ValidationPipe())
