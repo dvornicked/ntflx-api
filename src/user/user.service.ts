@@ -9,6 +9,8 @@ import { IUsersQuery } from './types/usersQuery.interface'
 import { FilmEntity } from 'src/film/film.entity'
 import { IFavoriteQuery } from './types/favoriteQuery.interface'
 import { favoriteFilmDto } from './dto/favoriteFilm.dto'
+import { GenreEntity } from 'src/genre/genre.entity'
+import { favoriteGenreDto } from './dto/favoriteGenre.dto'
 
 @Injectable()
 export class UserService {
@@ -17,11 +19,13 @@ export class UserService {
 		private readonly userRepository: Repository<UserEntity>,
 		@InjectRepository(FilmEntity)
 		private readonly filmRepository: Repository<FilmEntity>,
+		@InjectRepository(GenreEntity)
+		private readonly genreRepository: Repository<GenreEntity>,
 	) {}
 	async findById(id: number): Promise<UserEntity> {
 		const user = await this.userRepository.findOne({
 			where: { id },
-			relations: ['favoriteFilms'],
+			relations: ['favoriteFilms', 'favoriteGenres'],
 		})
 		if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
 		return user
@@ -95,6 +99,7 @@ export class UserService {
 
 	async getFavoriteFilms(id: number, query: IFavoriteQuery) {
 		const user = await this.findById(id)
+		const count = user.favoriteFilms.length
 		if (query.offset)
 			user.favoriteFilms = user.favoriteFilms.slice(query.offset)
 		query.order === 'ASC'
@@ -102,6 +107,31 @@ export class UserService {
 			: user.favoriteFilms.sort().reverse()
 		if (query.limit)
 			user.favoriteFilms = user.favoriteFilms.slice(0, query.limit)
-		return user.favoriteFilms
+		return { films: user.favoriteFilms, count }
+	}
+
+	async toggleFavoriteGenre(id: number, dto: favoriteGenreDto) {
+		const user = await this.findById(id)
+		const genre = await this.genreRepository.findOneBy({ id: dto.genreId })
+		if (!genre) throw new HttpException('Genre not found', HttpStatus.NOT_FOUND)
+		if (user.favoriteGenres.includes(genre)) {
+			user.favoriteGenres = user.favoriteGenres.filter(g => g.id !== genre.id)
+		} else {
+			user.favoriteGenres.push(genre)
+		}
+		return this.userRepository.save(user)
+	}
+
+	async getFavoriteGenres(id: number, query: IFavoriteQuery) {
+		const user = await this.findById(id)
+		const count = user.favoriteGenres.length
+		if (query.offset)
+			user.favoriteGenres = user.favoriteGenres.slice(query.offset)
+		query.order === 'ASC'
+			? user.favoriteGenres.sort()
+			: user.favoriteGenres.sort().reverse()
+		if (query.limit)
+			user.favoriteGenres = user.favoriteGenres.slice(0, query.limit)
+		return { genres: user.favoriteGenres, count }
 	}
 }

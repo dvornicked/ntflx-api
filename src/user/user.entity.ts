@@ -1,5 +1,6 @@
 import { hash } from 'bcrypt'
 import { FilmEntity } from 'src/film/film.entity'
+import { GenreEntity } from 'src/genre/genre.entity'
 import {
 	BeforeInsert,
 	BeforeUpdate,
@@ -49,4 +50,8 @@ export class UserEntity {
 	@ManyToMany(() => FilmEntity)
 	@JoinTable()
 	favoriteFilms: FilmEntity[]
+
+	@ManyToMany(() => GenreEntity)
+	@JoinTable()
+	favoriteGenres: GenreEntity[]
 }
