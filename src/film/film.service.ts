@@ -50,6 +50,7 @@ export class FilmService {
 			},
 		})
 		if (!film) throw new HttpException('Film not found', HttpStatus.NOT_FOUND)
+		await this.filmRepository.update({ id }, { views: film.views + 1 })
 		return film
 	}
 
