@@ -12,6 +12,7 @@ import {
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm'
+import { RatingEntity } from './user.rating.entity'
 
 export enum UserRole {
 	USER = 'USER',
@@ -54,4 +55,8 @@ export class UserEntity {
 	@ManyToMany(() => GenreEntity)
 	@JoinTable()
 	favoriteGenres: GenreEntity[]
+
+	@ManyToMany(() => GenreEntity)
+	@JoinTable()
+	ratedFilms: RatingEntity[]
 }

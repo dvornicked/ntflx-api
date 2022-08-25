@@ -2,8 +2,10 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ActorEntity } from 'src/actor/actor.entity'
 import { GenreEntity } from 'src/genre/genre.entity'
+import { RatingEntity, ResourseType } from 'src/user/user.rating.entity'
 import { Repository } from 'typeorm'
 import { CreateFilmDto } from './dto/createFilm.dto'
+import { SetRatingDto } from './dto/setRating.dto'
 import { UpdateFilmDto } from './dto/updateFilm.dto'
 import { FilmEntity } from './film.entity'
 import { IFilmQuery } from './types/IFilmQuery.interface'
@@ -17,6 +19,8 @@ export class FilmService {
 		private readonly actorRepository: Repository<ActorEntity>,
 		@InjectRepository(GenreEntity)
 		private readonly genreRepository: Repository<GenreEntity>,
+		@InjectRepository(RatingEntity)
+		private readonly ratingRepository: Repository<RatingEntity>,
 	) {}
 
 	async findAll(query: IFilmQuery) {
@@ -100,5 +104,44 @@ export class FilmService {
 	async delete(id: number) {
 		const film = await this.findById(id)
 		return await this.filmRepository.remove(film)
+	}
+
+	async setRating(id: number, userId: number, dto: SetRatingDto) {
+		const film = await this.findById(id)
+		const condition = {
+			userId,
+			resourseId: id,
+			resourseType: ResourseType.FILM,
+		}
+
+		const rate = await this.ratingRepository.findOne({
+			where: condition,
+		})
+
+		if (rate) {
+			film.rating -= rate.value
+			film.ratingCount--
+
+			if (dto.value === 0) {
+				await this.ratingRepository.remove(rate)
+				return this.filmRepository.save(film)
+			}
+		} else if (dto.value === 0) {
+			return await this.filmRepository.save(film)
+		}
+
+		const newRate = {
+			userId,
+			resourseId: id,
+			resourseType: ResourseType.FILM,
+			value: dto.value,
+		}
+		film.rating += dto.value
+		film.ratingCount++
+
+		rate
+			? await this.ratingRepository.update(condition, newRate)
+			: await this.ratingRepository.save(newRate)
+		return await this.filmRepository.save(film)
 	}
 }
