@@ -23,6 +23,10 @@ export class UpdateFilmDto {
 
 	@IsOptional()
 	@IsString()
+	wideImage: string
+
+	@IsOptional()
+	@IsString()
 	video: string
 
 	@IsOptional()

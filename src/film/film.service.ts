@@ -25,16 +25,17 @@ export class FilmService {
 
 	async findAll(query: IFilmQuery) {
 		const queryBuilder = this.filmRepository.createQueryBuilder('film')
-		const count = await queryBuilder.getCount()
-		queryBuilder.leftJoinAndSelect('film.actors', 'actors')
-		queryBuilder.leftJoinAndSelect('film.genres', 'genres')
-		if (query.limit) queryBuilder.limit(query.limit)
-		if (query.offset) queryBuilder.offset(query.offset)
-		if (query.order) queryBuilder.orderBy(query.order)
 		if (query.title)
 			queryBuilder.andWhere('LOWER(film.title) LIKE :title', {
 				title: `%${query.title.toLowerCase()}%`,
 			})
+		const count = await queryBuilder.getCount()
+		queryBuilder.leftJoinAndSelect('film.actors', 'actors')
+		queryBuilder.leftJoinAndSelect('film.genres', 'genres')
+		if (query.limit) queryBuilder.take(query.limit)
+		if (query.offset) queryBuilder.offset(query.offset)
+		if (query.order) queryBuilder.orderBy('film.title', query.order)
+
 		const films = await queryBuilder.getMany()
 		return { films, count }
 	}

@@ -22,6 +22,9 @@ export class FilmEntity {
 	@Column()
 	image: string
 
+	@Column({ default: '' })
+	wideImage: string
+
 	@Column()
 	video: string
 
