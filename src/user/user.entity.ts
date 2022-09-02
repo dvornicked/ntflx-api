@@ -42,6 +42,12 @@ export class UserEntity {
 	@Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
 	role: string
 
+	@Column({ default: '' })
+	image: string
+
+	@Column({ default: '' })
+	desc: string
+
 	@CreateDateColumn()
 	createdAt: Date
 
