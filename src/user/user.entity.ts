@@ -42,7 +42,7 @@ export class UserEntity {
 	@Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
 	role: string
 
-	@Column({ default: '' })
+	@Column({ default: '/uploads/files/7hkjow-avatar.jpg' })
 	image: string
 
 	@Column({ default: '' })
