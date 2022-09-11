@@ -60,6 +60,14 @@ export class UserController {
 		return this.userService.getFavoriteFilms(id, query)
 	}
 
+	@Get('favorite/films/:id')
+	async getFavoriteFilmsById(
+		@Param('id') id: number,
+		@Query() query: IFavoriteQuery,
+	) {
+		return this.userService.getFavoriteFilms(id, query)
+	}
+
 	@Put('favorite/film')
 	@Auth()
 	@UsePipes(new ValidationPipe())

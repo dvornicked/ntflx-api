@@ -36,18 +36,32 @@ export class UserService {
 		const userByUsername = await this.userRepository.findOneBy({
 			username: dto.username,
 		})
-		if (userByUsername && userByUsername.id !== id) {
-			throw new HttpException('Username already in use', HttpStatus.BAD_REQUEST)
-		}
-		user.username = dto.username
+		user.desc = dto.desc
 
-		const userByEmail = await this.userRepository.findOneBy({
-			email: dto.email,
-		})
-		if (userByEmail && userByEmail.id !== id) {
-			throw new HttpException('Email already in use', HttpStatus.BAD_REQUEST)
+		if (dto.username) {
+			if (userByUsername && userByUsername.id !== id) {
+				throw new HttpException(
+					'Username already in use',
+					HttpStatus.BAD_REQUEST,
+				)
+			}
+			user.username = dto.username
 		}
-		user.email = dto.email
+
+		if (dto.email) {
+			const userByEmail = await this.userRepository.findOneBy({
+				email: dto.email,
+			})
+			if (userByEmail && userByEmail.id !== id) {
+				throw new HttpException('Email already in use', HttpStatus.BAD_REQUEST)
+			}
+			user.email = dto.email
+		}
+
+		if (dto.image) {
+			user.image = dto.image
+		}
+
 		return this.userRepository.save(user)
 	}
 
