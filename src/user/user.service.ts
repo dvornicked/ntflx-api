@@ -6,15 +6,27 @@ import { UpdateUserDto } from './dto/updateUser.dto'
 import { UpdateRoleDto } from './dto/updateRole.dto'
 import { UserEntity } from './user.entity'
 import { IUsersQuery } from './types/usersQuery.interface'
+import { FilmEntity } from 'src/film/film.entity'
+import { IFavoriteQuery } from './types/favoriteQuery.interface'
+import { favoriteFilmDto } from './dto/favoriteFilm.dto'
+import { GenreEntity } from 'src/genre/genre.entity'
+import { favoriteGenreDto } from './dto/favoriteGenre.dto'
 
 @Injectable()
 export class UserService {
 	constructor(
 		@InjectRepository(UserEntity)
 		private readonly userRepository: Repository<UserEntity>,
+		@InjectRepository(FilmEntity)
+		private readonly filmRepository: Repository<FilmEntity>,
+		@InjectRepository(GenreEntity)
+		private readonly genreRepository: Repository<GenreEntity>,
 	) {}
 	async findById(id: number): Promise<UserEntity> {
-		const user = await this.userRepository.findOneBy({ id })
+		const user = await this.userRepository.findOne({
+			where: { id },
+			relations: ['favoriteFilms', 'favoriteGenres'],
+		})
 		if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND)
 		return user
 	}
@@ -24,18 +36,32 @@ export class UserService {
 		const userByUsername = await this.userRepository.findOneBy({
 			username: dto.username,
 		})
-		if (userByUsername && userByUsername.id !== id) {
-			throw new HttpException('Username already in use', HttpStatus.BAD_REQUEST)
-		}
-		user.username = dto.username
+		user.desc = dto.desc
 
-		const userByEmail = await this.userRepository.findOneBy({
-			email: dto.email,
-		})
-		if (userByEmail && userByEmail.id !== id) {
-			throw new HttpException('Email already in use', HttpStatus.BAD_REQUEST)
+		if (dto.username) {
+			if (userByUsername && userByUsername.id !== id) {
+				throw new HttpException(
+					'Username already in use',
+					HttpStatus.BAD_REQUEST,
+				)
+			}
+			user.username = dto.username
 		}
-		user.email = dto.email
+
+		if (dto.email) {
+			const userByEmail = await this.userRepository.findOneBy({
+				email: dto.email,
+			})
+			if (userByEmail && userByEmail.id !== id) {
+				throw new HttpException('Email already in use', HttpStatus.BAD_REQUEST)
+			}
+			user.email = dto.email
+		}
+
+		if (dto.image) {
+			user.image = dto.image
+		}
+
 		return this.userRepository.save(user)
 	}
 
@@ -71,5 +97,55 @@ export class UserService {
 	async deleteUser(id: number) {
 		const user = await this.findById(id)
 		return this.userRepository.remove(user)
+	}
+
+	async toggleFavoriteFilm(id: number, dto: favoriteFilmDto) {
+		const user = await this.findById(id)
+		const film = await this.filmRepository.findOneBy({ id: dto.filmId })
+		if (!film) throw new HttpException('Film not found', HttpStatus.NOT_FOUND)
+		if (user.favoriteFilms.includes(film)) {
+			user.favoriteFilms = user.favoriteFilms.filter(f => f.id !== film.id)
+		} else {
+			user.favoriteFilms.push(film)
+		}
+		return this.userRepository.save(user)
+	}
+
+	async getFavoriteFilms(id: number, query: IFavoriteQuery) {
+		const user = await this.findById(id)
+		const count = user.favoriteFilms.length
+		if (query.offset)
+			user.favoriteFilms = user.favoriteFilms.slice(query.offset)
+		query.order === 'ASC'
+			? user.favoriteFilms.sort()
+			: user.favoriteFilms.sort().reverse()
+		if (query.limit)
+			user.favoriteFilms = user.favoriteFilms.slice(0, query.limit)
+		return { films: user.favoriteFilms, count }
+	}
+
+	async toggleFavoriteGenre(id: number, dto: favoriteGenreDto) {
+		const user = await this.findById(id)
+		const genre = await this.genreRepository.findOneBy({ id: dto.genreId })
+		if (!genre) throw new HttpException('Genre not found', HttpStatus.NOT_FOUND)
+		if (user.favoriteGenres.includes(genre)) {
+			user.favoriteGenres = user.favoriteGenres.filter(g => g.id !== genre.id)
+		} else {
+			user.favoriteGenres.push(genre)
+		}
+		return this.userRepository.save(user)
+	}
+
+	async getFavoriteGenres(id: number, query: IFavoriteQuery) {
+		const user = await this.findById(id)
+		const count = user.favoriteGenres.length
+		if (query.offset)
+			user.favoriteGenres = user.favoriteGenres.slice(query.offset)
+		query.order === 'ASC'
+			? user.favoriteGenres.sort()
+			: user.favoriteGenres.sort().reverse()
+		if (query.limit)
+			user.favoriteGenres = user.favoriteGenres.slice(0, query.limit)
+		return { genres: user.favoriteGenres, count }
 	}
 }

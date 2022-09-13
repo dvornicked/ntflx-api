@@ -22,6 +22,9 @@ import { UpdateUserDto } from './dto/updateUser.dto'
 import { UpdateRoleDto } from './dto/updateRole.dto'
 import { UpdatePasswordDto } from './dto/updatePassword.dto'
 import { IUsersQuery } from './types/usersQuery.interface'
+import { IFavoriteQuery } from './types/favoriteQuery.interface'
+import { favoriteFilmDto } from './dto/favoriteFilm.dto'
+import { favoriteGenreDto } from './dto/favoriteGenre.dto'
 
 @Controller()
 export class UserController {
@@ -48,12 +51,50 @@ export class UserController {
 		return this.userService.updateUser(id, dto)
 	}
 
-	@Put('profile/password')
+	@Get('favorite/films')
 	@Auth()
-	@UseInterceptors(UserInterceptor)
+	async getFavoriteFilms(
+		@User('id') id: number,
+		@Query() query: IFavoriteQuery,
+	) {
+		return this.userService.getFavoriteFilms(id, query)
+	}
+
+	@Get('favorite/films/:id')
+	async getFavoriteFilmsById(
+		@Param('id') id: number,
+		@Query() query: IFavoriteQuery,
+	) {
+		return this.userService.getFavoriteFilms(id, query)
+	}
+
+	@Put('favorite/film')
+	@Auth()
 	@UsePipes(new ValidationPipe())
-	async updatePassword(@User('id') id: number, @Body() dto: UpdatePasswordDto) {
-		return this.userService.updatePassword(id, dto)
+	async toggleFavoriteFilms(
+		@User('id') id: number,
+		@Body() dto: favoriteFilmDto,
+	) {
+		return this.userService.toggleFavoriteFilm(id, dto)
+	}
+
+	@Get('favorite/genres')
+	@Auth()
+	async getFavoriteGenres(
+		@User('id') id: number,
+		@Query() query: IFavoriteQuery,
+	) {
+		return this.userService.getFavoriteGenres(id, query)
+	}
+
+	@Put('favorite/genre')
+	@Auth()
+	@UsePipes(new ValidationPipe())
+	async toggleFavoriteGenres(
+		@User('id') id: number,
+		@Body() dto: favoriteGenreDto,
+	) {
+		return this.userService.toggleFavoriteGenre(id, dto)
 	}
 
 	@Get('profile/:id')
@@ -77,7 +118,15 @@ export class UserController {
 		return this.userService.deleteUser(id)
 	}
 
-	@Put('profile/:id/password')
+	@Put('password')
+	@Auth()
+	@UseInterceptors(UserInterceptor)
+	@UsePipes(new ValidationPipe())
+	async updatePassword(@User('id') id: number, @Body() dto: UpdatePasswordDto) {
+		return this.userService.updatePassword(id, dto)
+	}
+
+	@Put('password/:id')
 	@Auth(UserRole.ADMIN)
 	@UseInterceptors(UserInterceptor)
 	@UsePipes(new ValidationPipe())
@@ -88,7 +137,7 @@ export class UserController {
 		return this.userService.updatePassword(id, dto)
 	}
 
-	@Put('profile/:id/role')
+	@Put('role/:id')
 	@Auth(UserRole.ADMIN)
 	@UseInterceptors(UserInterceptor)
 	@UsePipes(new ValidationPipe())

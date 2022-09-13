@@ -62,15 +62,19 @@ export class AuthService {
 
 	async refreshToken(dto: RefreshTokenDto) {
 		if (!dto.refreshToken) throw new HttpException('Invalid refresh token', 401)
-		const payload = await this.jwtService.verifyAsync(dto.refreshToken)
-		if (!payload)
-			throw new HttpException('Refresh token invalid or expired', 401)
-		const user = await this.authRepository.findOneBy({
-			id: payload.id,
-		})
-		return {
-			user: this.userTransform(user),
-			...(await this.iTokens(user)),
+		try {
+			const payload = await this.jwtService.verifyAsync(dto.refreshToken)
+			if (!payload)
+				throw new HttpException('Refresh token invalid or expired', 401)
+			const user = await this.authRepository.findOneBy({
+				id: payload.id,
+			})
+			return {
+				user: this.userTransform(user),
+				...(await this.iTokens(user)),
+			}
+		} catch {
+			throw new HttpException('Invalid refresh token', 401)
 		}
 	}
 

@@ -22,6 +22,9 @@ export class FilmEntity {
 	@Column()
 	image: string
 
+	@Column({ default: '' })
+	wideImage: string
+
 	@Column()
 	video: string
 
@@ -33,6 +36,9 @@ export class FilmEntity {
 
 	@Column({ default: 0 })
 	rating: number
+
+	@Column({ default: 0 })
+	ratingCount: number
 
 	@Column()
 	duration: number

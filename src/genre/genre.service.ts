@@ -14,15 +14,16 @@ export class GenreService {
 	) {}
 
 	async findAll(query: IGenreQuery) {
-		const queryBuilder = this.genreRepository.createQueryBuilder('actor')
+		const queryBuilder = this.genreRepository.createQueryBuilder('genre')
 		const count = await queryBuilder.getCount()
-		if (query.limit) queryBuilder.limit(query.limit)
-		if (query.offset) queryBuilder.offset(query.offset)
-		if (query.order) queryBuilder.orderBy(query.order)
 		if (query.name)
 			queryBuilder.andWhere('LOWER(actor.name) LIKE :name', {
 				name: `%${query.name.toLowerCase()}%`,
 			})
+		if (query.limit) queryBuilder.limit(query.limit)
+		if (query.offset) queryBuilder.offset(query.offset)
+		if (query.order) queryBuilder.orderBy('genre.name', query.order)
+
 		const genres = await queryBuilder.getMany()
 		return { genres, count }
 	}

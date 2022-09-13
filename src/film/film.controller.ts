@@ -11,8 +11,10 @@ import {
 	ValidationPipe,
 } from '@nestjs/common'
 import { Auth } from 'src/auth/decorators/auth.decorator'
+import { User } from 'src/user/decorators/user.decorator'
 import { UserRole } from 'src/user/user.entity'
 import { CreateFilmDto } from './dto/createFilm.dto'
+import { SetRatingDto } from './dto/setRating.dto'
 import { UpdateFilmDto } from './dto/updateFilm.dto'
 import { FilmService } from './film.service'
 import { IFilmQuery } from './types/IFilmQuery.interface'
@@ -49,5 +51,16 @@ export class FilmController {
 	@Auth(UserRole.ADMIN)
 	delete(@Param('id') id: number) {
 		return this.filmService.delete(id)
+	}
+
+	@Post('rating/:id')
+	@UsePipes(new ValidationPipe())
+	@Auth()
+	setRating(
+		@Param('id') id: number,
+		@User('id') userId: number,
+		@Body() setRatingDto: SetRatingDto,
+	) {
+		return this.filmService.setRating(id, userId, setRatingDto)
 	}
 }

@@ -1,13 +1,18 @@
 import { hash } from 'bcrypt'
+import { FilmEntity } from 'src/film/film.entity'
+import { GenreEntity } from 'src/genre/genre.entity'
 import {
 	BeforeInsert,
 	BeforeUpdate,
 	Column,
 	CreateDateColumn,
 	Entity,
+	JoinTable,
+	ManyToMany,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm'
+import { RatingEntity } from './user.rating.entity'
 
 export enum UserRole {
 	USER = 'USER',
@@ -37,9 +42,27 @@ export class UserEntity {
 	@Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
 	role: string
 
+	@Column({ default: '/uploads/files/7hkjow-avatar.jpg' })
+	image: string
+
+	@Column({ default: '' })
+	desc: string
+
 	@CreateDateColumn()
 	createdAt: Date
 
 	@UpdateDateColumn()
 	updatedAt: Date
+
+	@ManyToMany(() => FilmEntity)
+	@JoinTable()
+	favoriteFilms: FilmEntity[]
+
+	@ManyToMany(() => GenreEntity)
+	@JoinTable()
+	favoriteGenres: GenreEntity[]
+
+	@ManyToMany(() => GenreEntity)
+	@JoinTable()
+	ratedFilms: RatingEntity[]
 }
