@@ -36,12 +36,12 @@ export class UpdateFilmDto {
 	@IsOptional()
 	@IsNumber()
 	duration: number
+	
+	@IsOptional()
+	@IsNumber({}, { each: true })
+	actors: number[]
 
 	@IsOptional()
-	@IsNumber()
-	actors?: number[]
-
-	@IsOptional()
-	@IsNumber()
-	genres?: number[]
+	@IsNumber({}, { each: true })
+	genres: number[]
 }
