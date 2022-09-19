@@ -30,11 +30,11 @@ export class UpdateFilmDto {
 	video: string
 
 	@IsOptional()
-	@IsDate()
-	releaseDate: Date
+	@IsISO8601()
+	releaseDate: string
 
 	@IsOptional()
-	@IsDate()
+	@IsNumber()
 	duration: number
 
 	@IsOptional()
