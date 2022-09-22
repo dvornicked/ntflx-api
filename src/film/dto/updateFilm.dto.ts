@@ -30,18 +30,18 @@ export class UpdateFilmDto {
 	video: string
 
 	@IsOptional()
-	@IsDate()
-	releaseDate: Date
+	@IsISO8601()
+	releaseDate: string
 
 	@IsOptional()
-	@IsDate()
+	@IsNumber()
 	duration: number
+	
+	@IsOptional()
+	@IsNumber({}, { each: true })
+	actors: number[]
 
 	@IsOptional()
-	@IsNumber()
-	actors?: number[]
-
-	@IsOptional()
-	@IsNumber()
-	genres?: number[]
+	@IsNumber({}, { each: true })
+	genres: number[]
 }
