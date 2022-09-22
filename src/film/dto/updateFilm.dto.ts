@@ -1,5 +1,5 @@
 import {
-	IsDate,
+	IsISO8601,
 	IsNotEmpty,
 	IsNumber,
 	IsOptional,
@@ -36,7 +36,7 @@ export class UpdateFilmDto {
 	@IsOptional()
 	@IsNumber()
 	duration: number
-	
+
 	@IsOptional()
 	@IsNumber({}, { each: true })
 	actors: number[]
