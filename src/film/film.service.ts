@@ -108,6 +108,30 @@ export class FilmService {
 		return await this.filmRepository.remove(film)
 	}
 
+	async getAllRatedFilms(userId: number) {
+		const rates = await this.ratingRepository.find({
+			where: {
+				userId,
+				resourseType: ResourseType.FILM,
+			},
+		})
+		const films = await Promise.all(
+			rates.map(async rate => {
+				const film = await this.filmRepository.findOne({
+					where: {
+						id: rate.resourseId,
+					},
+					relations: {
+						actors: true,
+						genres: true,
+					},
+				})
+				return { ...film, rate: rate.value }
+			}),
+		)
+		return { films, count: films.length }
+	}
+
 	async setRating(id: number, userId: number, dto: SetRatingDto) {
 		const film = await this.findById(id)
 		const condition = {

@@ -28,6 +28,12 @@ export class FilmController {
 		return this.filmService.findAll(query)
 	}
 
+	@Get('rated')
+	@Auth(UserRole.USER)
+	getRatings(@User('id') id: number) {
+		return this.filmService.getAllRatedFilms(id)
+	}
+
 	@Get(':id')
 	findById(@Param('id') id: number) {
 		return this.filmService.findById(id)
