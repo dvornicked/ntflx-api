@@ -103,7 +103,7 @@ export class UserService {
 		const user = await this.findById(id)
 		const film = await this.filmRepository.findOneBy({ id: dto.filmId })
 		if (!film) throw new HttpException('Film not found', HttpStatus.NOT_FOUND)
-		if (user.favoriteFilms.includes(film)) {
+		if (user.favoriteFilms.find(film => film.id === dto.filmId)) {
 			user.favoriteFilms = user.favoriteFilms.filter(f => f.id !== film.id)
 		} else {
 			user.favoriteFilms.push(film)
